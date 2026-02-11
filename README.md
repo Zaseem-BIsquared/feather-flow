@@ -21,13 +21,13 @@ Most workflow tools for AI coding assistants are heavy — dozens of dependencie
 **One-line install:**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/sirajraval/feather-flow/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/siraj-samsudeen/feather-flow/main/install.sh | bash
 ```
 
 **From clone:**
 
 ```bash
-git clone https://github.com/sirajraval/feather-flow.git && cd feather-flow && ./install.sh
+git clone https://github.com/siraj-samsudeen/feather-flow.git && cd feather-flow && ./install.sh
 ```
 
 After either method, restart Claude Code, then type `/feather:help` to get started.

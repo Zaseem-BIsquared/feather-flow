@@ -5,12 +5,12 @@ set -e
 # feather-flow installer
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/sirajraval/feather-flow/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/siraj-samsudeen/feather-flow/main/install.sh | bash
 #   -- or --
-#   git clone https://github.com/sirajraval/feather-flow.git && cd feather-flow && bash install.sh
+#   git clone https://github.com/siraj-samsudeen/feather-flow.git && cd feather-flow && bash install.sh
 # ─────────────────────────────────────────────────────────────────────────────
 
-REPO="sirajraval/feather-flow"
+REPO="siraj-samsudeen/feather-flow"
 INSTALL_DIR="$HOME/.claude/feather-flow"
 SKILLS_DIR="$INSTALL_DIR/skills"
 
