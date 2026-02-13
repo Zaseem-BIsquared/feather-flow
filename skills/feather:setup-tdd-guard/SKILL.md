@@ -17,7 +17,7 @@ TDD Guard is a Claude Code hook that prevents writing implementation code until 
 
 ## Resume Detection
 
-If `.claude/settings.json` already exists with `tdd-guard` hooks AND `vitest.config.ts` exists with `VitestReporter`, steps 1-8 are already done. Skip directly to **Step 10 (Smoke Test)**.
+If `.claude/settings.json` already exists with `tdd-guard` hooks AND `vitest.config.ts` exists with `VitestReporter`, steps 1-7 are already done. Skip directly to **Step 9 (Smoke Test)**.
 
 ## Git Workflow
 
@@ -26,9 +26,9 @@ If `.claude/settings.json` already exists with `tdd-guard` hooks AND `vitest.con
 git status  # Must be clean (no uncommitted changes)
 ```
 
-**After smoke test passes (step 10b blocks the write):**
+**After smoke test passes (step 9b proves the guard blocks):**
 ```bash
-git add vitest.config.ts .claude/settings.json src/test/setup.ts package.json package-lock.json .gitignore
+git add vitest.config.ts .claude/settings.json package.json package-lock.json .gitignore
 git commit -m "Set up TDD Guard with Vitest"
 ```
 
@@ -55,33 +55,26 @@ Verify: `tdd-guard --version`
 ### 2. Install Project Dependencies (local)
 
 ```bash
-npm install -D vitest jsdom @testing-library/react @testing-library/jest-dom tdd-guard-vitest
+npm install -D vitest tdd-guard-vitest
 ```
 
 ### 3. Create vitest.config.ts
 
 ```typescript
 import { defineConfig } from "vitest/config";
-import react from "@vitejs/plugin-react";
-import path from "path";
 import { VitestReporter } from "tdd-guard-vitest";
 
 export default defineConfig({
-  plugins: [react()],
   test: {
-    environment: "jsdom",
     globals: true,
     reporters: ["default", new VitestReporter(__dirname)],
-    setupFiles: ["./src/test/setup.ts"],
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],
       exclude: [
         "node_modules/",
-        "src/test/",
-        "**/*.test.{ts,tsx}",
+        "**/*.test.{ts,tsx,js,jsx}",
         "**/*.config.{ts,js}",
-        "convex/_generated/",
       ],
       thresholds: {
         lines: 100,
@@ -91,38 +84,24 @@ export default defineConfig({
       },
     },
   },
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-    },
-  },
 });
 ```
 
 **Key parts:**
 - `VitestReporter(__dirname)` - Reports test state to `.claude/tdd-guard/data/test.json`
 - `globals: true` - Enables `describe`, `it`, `expect` without imports
-- `setupFiles` - For jest-dom matchers
 - `coverage.thresholds` - **Fails tests if coverage drops below 100%**
-- `coverage.exclude` - Ignores test files, config, and generated code
+- `coverage.exclude` - Ignores test files and config files
 
-**Adapt to your stack:** The config above assumes React + Convex. Remove `@vitejs/plugin-react` and `@testing-library/react` for non-React projects. Remove `convex/_generated/` from coverage exclusions if not using Convex.
+**Stack-specific setup:** For React projects, run `/feather:setup-react-testing` after this skill to add jsdom, @testing-library/react, and React plugin configuration.
 
-### 4. Create Test Setup File
-
-Create `src/test/setup.ts`:
-
-```typescript
-import "@testing-library/jest-dom/vitest";
-```
-
-### 5. Install Coverage Support
+### 4. Install Coverage Support
 
 ```bash
 npm install -D @vitest/coverage-v8
 ```
 
-### 6. Add npm Scripts
+### 5. Add npm Scripts
 
 In `package.json`:
 
@@ -136,7 +115,7 @@ In `package.json`:
 }
 ```
 
-### 7. Add to .gitignore
+### 6. Add to .gitignore
 
 ```
 # Test coverage
@@ -146,7 +125,7 @@ coverage/
 .claude/tdd-guard/
 ```
 
-### 8. Create Claude Hooks
+### 7. Create Claude Hooks
 
 Create `.claude/settings.json`:
 
@@ -183,30 +162,30 @@ Create `.claude/settings.json`:
 - **PreToolUse** — blocks writes when tests fail or are missing.
 - **SessionStart** — initializes guard state on session start/resume/clear.
 
-### 9. STOP — Reload Session
+### 8. STOP — Reload Session
 
 Hooks load once at session start. `/clear` does **not** reload them.
 
-**STOP HERE. Do not proceed to step 10. Do not write tests. Do not commit.**
+**STOP HERE. Do not proceed to step 9. Do not write tests. Do not commit.**
 
 Tell the user:
 > Setup files are in place. To activate the TDD Guard hooks, reload the session:
 > `/exit` then `claude -c`, or close and reopen the app.
-> After reload, run `/feather:setup-tdd-guard` again — it will detect the existing setup and resume at the smoke test (step 10).
+> After reload, run `/feather:setup-tdd-guard` again — it will detect the existing setup and resume at the smoke test (step 9).
 
-**Your turn ends here.** Step 10 runs in the new session.
+**Your turn ends here.** Step 9 runs in the new session.
 
 ---
 
-### 10. Smoke Test (run after session reload only)
+### 9. Smoke Test (run after session reload only)
 
 This test proves the guard actually works — not just that files are in place. **Do not skip it.**
 
-**Gate check:** This step must run in a **new session** after step 9. If you just created `.claude/settings.json` in this session, the hook is not active. STOP and tell the user to reload (see step 9).
+**Gate check:** This step must run in a **new session** after step 8. If you just created `.claude/settings.json` in this session, the hook is not active. STOP and tell the user to reload (see step 8).
 
-#### 10a. Pre-flight checks
+#### 9a. Pre-flight checks
 
-Run this to verify all pieces are in place. Every check must pass before continuing to 10b.
+Run this to verify all pieces are in place. Every check must pass before continuing to 9b.
 
 ```bash
 echo "=== TDD Guard Pre-flight ===" && PASS=0 && FAIL=0 && \
@@ -214,8 +193,6 @@ check() { if eval "$2" > /dev/null 2>&1; then echo "  PASS: $1"; PASS=$((PASS+1)
 check "tdd-guard CLI installed (global)" "command -v tdd-guard" && \
 check "vitest installed" "[ -d node_modules/vitest ]" && \
 check "tdd-guard-vitest installed" "[ -d node_modules/tdd-guard-vitest ]" && \
-check "@testing-library/react installed" "[ -d node_modules/@testing-library/react ]" && \
-check "@testing-library/jest-dom installed" "[ -d node_modules/@testing-library/jest-dom ]" && \
 check "@vitest/coverage-v8 installed" "[ -d node_modules/@vitest/coverage-v8 ]" && \
 check "vitest.config.ts exists" "[ -f vitest.config.ts ]" && \
 check "vitest.config.ts has VitestReporter" "grep -q 'VitestReporter' vitest.config.ts" && \
@@ -223,7 +200,6 @@ check ".claude/settings.json exists" "[ -f .claude/settings.json ]" && \
 check "PreToolUse hook configured" "grep -q 'PreToolUse' .claude/settings.json" && \
 check "SessionStart hook configured" "grep -q 'SessionStart' .claude/settings.json" && \
 check "Hook command is tdd-guard" "grep -q 'tdd-guard' .claude/settings.json" && \
-check "Test setup file exists" "[ -f src/test/setup.ts ] || [ -f src/test-setup.ts ]" && \
 check "test script in package.json" "node -e \"const p=require('./package.json'); process.exit(p.scripts?.test ? 0 : 1)\"" && \
 check "test:coverage script in package.json" "node -e \"const p=require('./package.json'); process.exit(p.scripts?.['test:coverage'] ? 0 : 1)\"" && \
 check "coverage/ in .gitignore" "grep -q 'coverage/' .gitignore" && \
@@ -232,9 +208,9 @@ echo "" && echo "Results: $PASS passed, $FAIL failed" && \
 if [ $FAIL -eq 0 ]; then echo "Pre-flight complete."; else echo "Fix failures before continuing."; fi
 ```
 
-If any check fails, go back and fix the corresponding step. Do not continue to 10b.
+If any check fails, go back and fix the corresponding step. Do not continue to 9b.
 
-#### 10b. Functional test — prove the guard blocks
+#### 9b. Functional test — prove the guard blocks
 
 This creates a failing test, runs vitest, then attempts to write implementation code. **The hook must block the write.** That block is the signal that the guard works.
 
@@ -276,11 +252,11 @@ export const probe = true;
 - If NOT blocked → **FAIL. STOP IMMEDIATELY. DO NOT COMMIT. DO NOT CONTINUE.**
   Print: `"Smoke test FAILED — guard did not block. Do not proceed."`
   Investigate before doing anything else:
-  - Session reloaded after step 9? (`/clear` does not reload hooks — must `/exit` then `claude -c`)
+  - Session reloaded after step 8? (`/clear` does not reload hooks — must `/exit` then `claude -c`)
   - `tdd-guard` CLI installed globally? (`command -v tdd-guard`)
   - `.claude/settings.json` loaded? (Check with `/hooks`)
   - `npx vitest run` → `.claude/tdd-guard/data/test.json` exists?
-  - Fix the issue, then re-run step 10b from the top. Do not commit until the guard blocks.
+  - Fix the issue, then re-run step 9b from the top. Do not commit until the guard blocks.
 
 **Step 5.** Verify runtime files are gitignored:
 
@@ -307,9 +283,6 @@ project/
 │   └── tdd-guard/
 │       └── data/
 │           └── test.json      # Test state (auto-generated)
-├── src/
-│   └── test/
-│       └── setup.ts           # Jest-dom matchers
 ├── vitest.config.ts           # Vitest + TDD Guard reporter
 └── package.json               # Test scripts
 ```
@@ -349,13 +322,9 @@ The `--no-verify` flag is standard git behavior and requires explicit intent to 
 - `/clear` does not reload hooks. Must start a new session: `/exit` then `claude -c`, or close and reopen.
 - Verify global CLI: `command -v tdd-guard && tdd-guard --version`. If not found, install: `npm install -g tdd-guard`.
 - Verify hooks loaded: run `/hooks` in Claude Code and confirm both hooks (PreToolUse, SessionStart) are listed.
-- `tdd-guard` reads stdin from hook context; it may hang when run directly in a terminal. Use the smoke test (step 10b) to confirm.
+- `tdd-guard` reads stdin from hook context; it may hang when run directly in a terminal. Use the smoke test (step 9b) to confirm.
 - Do **not** use `npx tdd-guard` as the hook command. The CLI must be installed globally.
 
 ### Tests not being tracked
 - Run `npm test` at least once to generate test.json
 - Check `.claude/tdd-guard/data/test.json` exists
-
-### Wrong environment errors
-- Ensure `environment: "jsdom"` for React component tests
-- Use `environmentMatchGlobs` for different test types (see Convex testing skill)

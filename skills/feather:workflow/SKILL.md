@@ -236,7 +236,7 @@ For larger projects with multiple features spanning multiple sessions:
 | Pre-commit hook | Git pre-commit | `git commit` if any check fails |
 | Vitest threshold | Coverage config | Tests fail if coverage drops below 100% |
 
-**Setup:** Run `/feather:setup-tdd-guard` before starting slice work.
+**Setup:** Run `/feather:setup-tdd-guard` before starting slice work. For React projects, also run `/feather:setup-react-testing`.
 
 ## Feedback Tracking
 

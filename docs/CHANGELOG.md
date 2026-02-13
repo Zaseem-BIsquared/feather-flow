@@ -2,6 +2,14 @@
 
 All notable changes to feather-flow will be documented in this file.
 
+## [Unreleased]
+
+### Changed
+- **`feather:setup-tdd-guard`** is now stack-agnostic — installs only vitest, tdd-guard-vitest, and @vitest/coverage-v8. No React/Convex dependencies.
+
+### Added
+- **`feather:setup-react-testing`** — new add-on skill for React projects. Installs @testing-library/react, jsdom, @vitejs/plugin-react, and configures vitest for component testing. Requires `feather:setup-tdd-guard` as prerequisite.
+
 ## [1.0.0] - 2026-02-11
 
 ### Added

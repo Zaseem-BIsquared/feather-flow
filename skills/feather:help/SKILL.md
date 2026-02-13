@@ -90,7 +90,8 @@ For larger projects spanning multiple sessions:
 
 | Skill | When to Use |
 |-------|-------------|
-| `/feather:setup-tdd-guard` | Enable TDD enforcement |
+| `/feather:setup-tdd-guard` | Enable TDD enforcement (core, any stack) |
+| `/feather:setup-react-testing` | Add React testing environment |
 | `/feather:write-tests` | TDD for single feature |
 | `/feather:verify` | Checkpoint 2 verification |
 | `/feather:finish` | Complete and merge work |
@@ -141,10 +142,11 @@ Claude: I'll use /feather:resume-slice to restore context...
 Before using slice workflow, ensure TDD infrastructure:
 
 ```bash
-/feather:setup-tdd-guard   # Installs TDD enforcement hooks
+/feather:setup-tdd-guard      # Core: hooks + coverage (required for all projects)
+/feather:setup-react-testing  # React: jsdom + testing-library (if React project)
 ```
 
-This enables:
+Core enables:
 - `tdd-guard` PreToolUse hook (blocks impl without tests)
 - 100% coverage thresholds
 - Pre-commit checks
@@ -155,6 +157,7 @@ This enables:
 |----------|--------|
 | "What skill should I use?" | `/feather:workflow` shows the decision tree |
 | "How does TDD work here?" | `/feather:setup-tdd-guard` explains enforcement |
+| "How do I test React components?" | `/feather:setup-react-testing` adds component testing |
 | "What's a slice?" | Vertical cut of functionality (UI → database) |
 | "Why STOP after each slice?" | Prevents context rot, keeps human in control |
 

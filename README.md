@@ -63,7 +63,8 @@ Break work into vertical slices, each independently shippable:
 | `/feather:create-spec` | Spec | Write behavioral specification with test hooks |
 | `/feather:derive-tests` | Spec | Derive test cases from spec |
 | `/feather:write-tests` | Test | Write tests from derived test cases (TDD) |
-| `/feather:setup-tdd-guard` | Test | Configure test watcher for red-green-refactor |
+| `/feather:setup-tdd-guard` | Test | Configure TDD enforcement (any stack) |
+| `/feather:setup-react-testing` | Test | Add React testing environment |
 | `/feather:create-plan` | Plan | Create implementation plan from spec |
 | `/feather:execute` | Execute | Execute plan with quality gates |
 | `/feather:verify` | Verify | Run verification checkpoint |
